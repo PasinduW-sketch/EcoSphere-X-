@@ -53,7 +53,7 @@ Some features are currently conceptual and may be implemented in the future.
 
 ## 📸 Preview
 
-> [*(Link )*](https://preeminent-haupia-e0276c.netlify.app/)
+> [*(EcoSphere X Web Site Link )*](https://preeminent-haupia-e0276c.netlify.app/)
 
 ---
 
