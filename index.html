@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoSphere X - AI-Powered Smart Waste Management | Colombo Pilot</title>
+  <meta name="description" content="EcoSphere X is an AI-powered smart waste management dashboard and system developed for the Colombo Municipal Council (CMC) pilot project. Smarter recycling, cleaner Colombo, greener future.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkBg: '#05070c',
+            cardBg: 'rgba(10, 15, 30, 0.45)',
+            glowGreen: 'rgba(34, 197, 94, 0.15)',
+            glowBlue: 'rgba(59, 130, 246, 0.15)',
+          },
+          fontFamily: {
+            sans: ['Outfit', 'Inter', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float-slow': 'float 8s ease-in-out infinite',
+            'float-fast': 'float 4s ease-in-out infinite',
+            'glow-pulse': 'glow-pulse 2s infinite alternate',
+            'spin-slow': 'spin 12s linear infinite',
+            'radar-sweep': 'radar-sweep 4s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            'glow-pulse': {
+              '0%': { boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)' },
+              '100%': { boxShadow: '0 0 25px rgba(34, 197, 94, 0.5)' }
+            },
+            'radar-sweep': {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Custom CSS Styles -->
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #05070c;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #141b2d;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+
+    /* Leaflet Dark Theme Customizations */
+    .leaflet-container {
+      background: #05070c !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(10, 15, 30, 0.85) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: #f8fafc !important;
+      border-radius: 12px !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
+      padding: 4px !important;
+    }
+    .leaflet-popup-tip {
+      background: rgba(10, 15, 30, 0.85) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .leaflet-bar {
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: none !important;
+    }
+    .leaflet-bar a {
+      background-color: rgba(10, 15, 30, 0.85) !important;
+      color: #f8fafc !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      transition: all 0.2s;
+    }
+    .leaflet-bar a:hover {
+      background-color: #3b82f6 !important;
+      color: white !important;
+    }
+
+    /* Glassmorphism Styles */
+    .glass-card {
+      background: rgba(10, 15, 30, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6), 0 0 15px rgba(59, 130, 246, 0.1);
+    }
+    .glass-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.3s;
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Animated Gradients */
+    .text-glow-green {
+      text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    }
+    .text-glow-blue {
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    .bg-gradient-mesh {
+      background-color: #05070c;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(34, 197, 94, 0.07) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.07) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(34, 197, 94, 0.05) 0px, transparent 50%);
+    }
+
+    /* Custom CSS animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .floating-element {
+      animation: float 6s ease-in-out infinite;
+    }
+  </style>
+  
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- React, ReactDOM, and Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gradient-mesh text-slate-100 font-sans min-h-screen overflow-x-hidden">
+  
+  <!-- Root React Node -->
+  <div id="root"></div>
+
+  <!-- React Application Core Logic -->
+  <script type="text/babel" src="app.js"></script>
+</body>
+</html>
